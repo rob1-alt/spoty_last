@@ -1,0 +1,36 @@
+version: "3"
+services:
+    spoty-api-php:
+        image: "pauulog/php-docker-dev:latest"
+        container_name: "spoty-api-php"
+        links:
+          - "spoty-api-php-mariadb:mariadb.host"
+        volumes:
+            - "./:/spoty-api-php:rw"
+        working_dir: /spoty-api-php
+        restart: always
+    workshop-nginx:
+        image: "nginx:1-alpine"
+        container_name: "spoty-api-php-nginx"
+        links:
+          - "spoty-api-php:spoty-api-php.host"
+        ports:
+          - 8080:80
+        volumes:
+            - "./:/spoty-api-php:rw"
+            - "./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:r"
+        working_dir: /spoty-api-php
+        restart: always
+    workshop-mariadb:
+        image: "mariadb:10.6"
+        container_name: "spoty-api-php-mariadb"
+        volumes:
+            - "._mysql_data_dir/:/var/lib/mysql:rw"
+        ports:
+          - 3307:3306
+        environment:
+          - MARIADB_USER
+          - MARIADB_PASSWORD
+          - MARIADB_DATABASE
+          - MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=true
+        restart: always
